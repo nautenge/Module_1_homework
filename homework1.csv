@@ -1,0 +1,210 @@
+using System;
+using System.Collections.Generic;
+
+class Book
+{
+    public string Title { get; set; }
+    public string Author { get; set; }
+    public string ISBN { get; set; }
+    public int Copies { get; set; }
+
+    public Book(string title, string author, string isbn, int copies)
+    {
+        Title = title;
+        Author = author;
+        ISBN = isbn;
+        Copies = copies;
+    }
+
+    // Метод для отображения информации
+    public void DisplayInfo()
+    {
+        Console.WriteLine($"Название: {Title}, Автор: {Author}, ISBN: {ISBN}, Количество экземпляров: {Copies}");
+    }
+    // Проверка наличия экземпляров
+    public bool IsAvailable()
+    {
+        return Copies > 0;
+    }
+
+
+    // Выдача книги
+    public bool BorrowBook()
+    {
+        if (IsAvailable())
+        {
+            Copies--;
+            return true;
+        }
+        return false;
+    }
+    // Возврат книги
+    public void ReturnBook()
+    {
+        Copies++;
+    }
+}
+
+
+class Reader
+{
+    public string Name { get; set; }
+    public int ReaderID { get; set; }
+
+    public Reader(string name, int readerID)
+    {
+        Name = name;
+        ReaderID = readerID;
+    }
+
+    // Метод для отображения
+    public void DisplayInfo()
+    {
+        Console.WriteLine($"Читатель: {Name}, ID: {ReaderID}");
+    }
+}
+
+
+class Library
+{
+    public List<Book> Books { get; private set; }
+    public List<Reader> Readers { get; private set; }
+
+    public Library()
+    {
+        Books = new List<Book>();
+        Readers = new List<Reader>();
+    }
+
+
+    // Метод для добавления книги
+    public void AddBook(Book book)
+    {
+        Books.Add(book);
+        Console.WriteLine($"Книга '{book.Title}' добавлена в библиотеку.");
+    }
+    // Метод для удаления книги
+    public void RemoveBook(Book book)
+    {
+        if (Books.Remove(book))
+        {
+            Console.WriteLine($"Книга '{book.Title}' удалена из библиотеки.");
+        }
+        else
+        {
+            Console.WriteLine($"Книга '{book.Title}' не найдена.");
+        }
+    }
+
+
+    // Метод для регистрации читателя
+    public void RegisterReader(Reader reader)
+    {
+        Readers.Add(reader);
+        Console.WriteLine($"Читатель {reader.Name} зарегистрирован.");
+    }
+    // Метод для удаления читателя
+    public void RemoveReader(Reader reader)
+    {
+        if (Readers.Remove(reader))
+        {
+            Console.WriteLine($"Читатель {reader.Name} удален.");
+        }
+        else
+        {
+            Console.WriteLine($"Читатель {reader.Name} не найден.");
+        }
+    }
+
+
+    // Выдача книги 
+    public void BorrowBook(Reader reader, Book book)
+    {
+        if (Readers.Contains(reader))
+        {
+            if (book.BorrowBook())
+            {
+                Console.WriteLine($"Читатель {reader.Name} взял книгу '{book.Title}'.");
+            }
+            else
+            {
+                Console.WriteLine($"Книга '{book.Title}' не доступна.");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Читатель {reader.Name} не зарегистрирован.");
+        }
+    }
+
+    // Возврат книги 
+    public void ReturnBook(Reader reader, Book book)
+    {
+        if (Readers.Contains(reader))
+        {
+            book.ReturnBook();
+            Console.WriteLine($"Читатель {reader.Name} вернул книгу '{book.Title}'.");
+        }
+        else
+        {
+            Console.WriteLine($"Читатель {reader.Name} не зарегистрирован.");
+        }
+    }
+
+    // Метод для отображения книг
+    public void DisplayBooks()
+    {
+        Console.WriteLine("Список книг в библиотеке:");
+        foreach (var book in Books)
+        {
+            book.DisplayInfo();
+            Console.WriteLine();
+        }
+    }
+
+    // Метод для отображения читателей
+    public void DisplayReaders()
+    {
+        Console.WriteLine("Список читателей:");
+        foreach (var reader in Readers)
+        {
+            reader.DisplayInfo();
+            Console.WriteLine();
+        }
+    }
+}
+
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем библиотеку
+        Library library = new Library();
+
+        // Добавляем книги
+        Book book1 = new Book("Алиса в Стране Чудес", "Льюис Кэрролл", "777777777", 2);
+        Book book2 = new Book("Бесы", "Федор Достоевский", "33333333", 2);
+        library.AddBook(book1);
+        library.AddBook(book2);
+
+        // Регистрируем читателей
+        Reader reader1 = new Reader("Александр Васильев", 1);
+        Reader reader2 = new Reader("Женилмес Нурбол", 2);
+        library.RegisterReader(reader1);
+        library.RegisterReader(reader2);
+
+        // Выдаем книги читателям
+        library.BorrowBook(reader1, book1); 
+        library.BorrowBook(reader2, book2); 
+
+        library.ReturnBook(reader1, book1); // Возврат книги
+
+        library.RemoveBook(book2);  // Удаляем книгу
+        library.RemoveReader(reader1);  // Удаляем читателя
+
+        // Отображаем список книг и читателей
+        library.DisplayBooks();
+        library.DisplayReaders();
+    }
+}
